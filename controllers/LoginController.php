@@ -75,6 +75,10 @@ class LoginController extends BaseController
 	public function Logout(\Slim\Http\Request $request, \Slim\Http\Response $response, array $args)
 	{
 		$this->SessionService->RemoveSession($_COOKIE[$this->SessionCookieName]);
+		if (isset($_SERVER['HTTP_X_REMOTE_USER']))
+		{
+			return $response->withStatus(401);
+		}
 		return $response->withRedirect($this->AppContainer->UrlManager->ConstructUrl('/'));
 	}
 
