@@ -54,6 +54,21 @@ class LoginController extends BaseController
 
 	public function LoginPage(\Slim\Http\Request $request, \Slim\Http\Response $response, array $args)
 	{
+		if (isset($_SERVER['HTTP_X_REMOTE_USER'])) 
+		{
+                        $user = $this->Database->users()->where('username', $_SERVER['HTTP_X_REMOTE_USER'])->fetch();
+			if ($user !== null)
+			{
+				$sessionKey = $this->SessionService->CreateSession($user->id, true);
+				setcookie($this->SessionCookieName, $sessionKey, intval(time() + 31220640000));
+				return $response->withRedirect($this->AppContainer->UrlManager->ConstructUrl('/'));
+			}
+			else
+			{
+				return $response->withRedirect($this->AppContainer->UrlManager->ConstructUrl('/login_invalid'));
+			}
+                }
+		
 		return $this->AppContainer->view->render($response, 'login');
 	}
 
